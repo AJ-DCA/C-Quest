@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>C Quest – BCA Assignment</title>
+<style>
+:root{--bg:#f6f7fb;--card:#fff;--tx:#1b2033;--mu:#5d6584;--ac:#4f46e5;--ok:#15803d;--bad:#b91c1c;--bd:#dfe2ee;--code:#12172b;--codetx:#d6e2ff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1120;--card:#171b30;--tx:#e8ebfa;--mu:#9aa3c7;--ac:#8b86ff;--ok:#4ade80;--bad:#f87171;--bd:#2a3050;--code:#0a0d1a}}
+:root[data-theme="dark"]{--bg:#0e1120;--card:#171b30;--tx:#e8ebfa;--mu:#9aa3c7;--ac:#8b86ff;--ok:#4ade80;--bad:#f87171;--bd:#2a3050;--code:#0a0d1a}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:720px;margin:0 auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:18px;margin-bottom:14px}
+h1{font-size:26px;margin:0 0 4px}h2{font-size:19px;margin:0 0 8px}
+.mu{color:var(--mu);font-size:14px}
+label{display:block;font-weight:600;margin:12px 0 4px;font-size:14px}
+input,select,textarea{width:100%;box-sizing:border-box;padding:10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font:inherit}
+button{font:inherit;cursor:pointer;border-radius:10px;border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:10px 14px}
+button.p{background:var(--ac);color:#fff;border-color:var(--ac);font-weight:600}
+button:disabled{opacity:.5;cursor:default}
+.opt{display:block;width:100%;text-align:left;margin:6px 0;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px}
+.opt.ok{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 15%,transparent)}
+.opt.no{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 15%,transparent)}
+pre{background:var(--code);color:var(--codetx);padding:12px;border-radius:10px;overflow-x:auto;font-size:13.5px;margin:8px 0}
+.bar{height:8px;background:var(--bd);border-radius:6px;overflow:hidden;margin:6px 0 12px}
+.bar i{display:block;height:100%;background:var(--ac)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.tag{display:inline-block;font-size:12px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--ac);color:#fff}
+.box{padding:10px;border-radius:8px;background:var(--bg);border:1px dashed var(--bd);margin-top:10px;font-size:14px}
+.tbl{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:13px}td,th{border-bottom:1px solid var(--bd);padding:6px;text-align:left;white-space:nowrap}
+canvas{max-width:100%;height:auto;border:1px solid var(--bd);border-radius:8px}
+</style></head><body><main id="app"></main>
+<script>
+const Q=[
+// Part A
+["A",'int a=2, b=3;\nif (a>1)\n   if (b>5) printf("X");\n   else printf("Y");',"What is printed?",["X","Y","XY","Nothing"],1,"The else binds to the nearest if (b>5). That is false, so Y prints."],
+["A",'int m=72;\nif (m>=90) printf("A");\nelse if (m>=75) printf("B");\nelse if (m>=60) printf("C");\nelse printf("D");',"Output of this else-if ladder?",["A","B","C","D"],2,"A ladder stops at the first true condition. 72 fails >=90 and >=75, passes >=60."],
+["A",'int x=2;\nswitch(x){\n case 1: printf("1");\n case 2: printf("2");\n case 3: printf("3"); break;\n default: printf("D");\n}',"What is printed?",["2","23","23D","123"],1,"No break after case 2, so execution falls through into case 3, then break stops it."],
+["A",'int x=10;\nx = (x>5) ? x-3 : x+3;\nprintf("%d", x);',"Value printed by the ternary expression?",["13","7","10","3"],1,"Condition x>5 is true, so the value before the colon (x-3 = 7) is chosen."],
+["A",'int i=1;\nloop: printf("%d ", i);\ni++;\nif (i<=3) goto loop;',"Output?",["1 2 3","1 2 3 4","1","Infinite loop"],0,"goto jumps back to the label while i<=3, giving 1 2 3."],
+["A",'int x=0;\nif (x=5) printf("Yes");\nelse printf("No");',"Common mistake: what happens?",["Yes","No","Compile error","Nothing"],0,"x=5 is an assignment, not a comparison. It evaluates to 5 (true), so Yes prints."],
+["A",'for(int i=1;i<=5;i++){\n  if(i==2) continue;\n  if(i==4) break;\n  printf("%d", i);\n}',"Output?",["1235","13","123","135"],1,"i=2 is skipped (continue); at i=4 the loop ends (break). Printed: 1 and 3."],
+["A",'int i=10;\ndo {\n  printf("%d ", i);\n  i++;\n} while (i<10);',"How many times does the body run?",["Zero","Once","Until i=10 again","Infinite"],1,"do-while checks the condition AFTER the body, so it always runs at least once."],
+["A",'for(i=1;i<=3;i++)\n  for(j=1;j<=i;j++)\n     printf("*");',"Total stars printed?",["3","6","9","4"],1,"Inner loop runs 1 + 2 + 3 times = 6."],
+// Part B
+["B",'int a[5] = {1, 2};\nprintf("%d", a[1] + a[3]);',"Output?",["2","3","Garbage","4"],0,"In partial initialization the remaining elements become 0, so 2 + 0 = 2."],
+["B",'int a[] = {4, 8, 15, 16};\nprintf("%d", sizeof(a)/sizeof(a[0]));',"What is printed?",["16","4","3","5"],1,"Total bytes divided by bytes of one element gives the element count: 4."],
+["B",'int m[2][2] = {{1,2},{3,4}};\nprintf("%d", m[1][0] + m[0][1]);',"Output?",["4","5","6","7"],1,"m[1][0]=3 and m[0][1]=2, sum is 5."],
+["B",'char s[] = "HELLO";\nprintf("%d %d", strlen(s), sizeof(s));',"Output?",["5 5","5 6","6 5","6 6"],1,"strlen ignores the null character (5); sizeof counts it (6)."],
+["B",'printf("%d", strcmp("abc","abc"));',"What does this print?",["1","0","-1","3"],1,"strcmp returns 0 when both strings are equal."],
+["B",'void swap(int a,int b){int t=a;a=b;b=t;}\nint main(){int x=1,y=2;\n swap(x,y);\n printf("%d %d",x,y);}',"Output?",["2 1","1 2","Error","Garbage"],1,"Call by value passes copies, so the originals are unchanged."],
+["B",'void inc(int *p){ (*p)++; }\nint main(){ int x=5;\n inc(&x);\n printf("%d", x); }',"Output?",["6","5","An address","Error"],0,"Call by reference (pointer) lets the function change the caller’s variable."],
+["B",'void f(int a[]){ a[0]=99; }\nint main(){ int arr[3]={1,2,3};\n f(arr);\n printf("%d", arr[0]); }',"Output?",["1","99","3","Error"],1,"An array name passes its address, so the function edits the original array."],
+["B",'int f(int n){\n  if(n==0) return 1;\n  return n * f(n-1);\n}\nprintf("%d", f(4));',"What is printed?",["10","16","24","120"],2,"Recursion computes 4×3×2×1×1 = 24 (factorial)."]
+];
+const CONFIG={FORM_ACTION:"",ENTRY:{name:"",enrol:"",div:"",score:"",partA:"",partB:"",tb:"",cert:""}};
+const HINTS=["Find which if the else is attached to: the closest unmatched one.","Conditions are checked top to bottom; stop at the first true one.","Look for a break after each case. What happens without it?","Evaluate the condition first, then pick the matching side of : .","Follow the label, print, increment, then test the jump condition.","Is = a comparison or an assignment? What value does it produce?","continue skips only the current round; break leaves the loop.","Where is the condition checked, before or after the body?","Count how many times the inner loop runs for i=1, 2 and 3.","Elements you do not initialize in a partially filled array become what?","sizeof gives bytes. How do you get a count from total size and one element size?","Remember row first, then column: m[row][col].","Does strlen count the hidden end-of-string character? Does sizeof?","What does strcmp return when two strings are identical?","Does the function receive the variable itself or a copy of it?","The function receives an address. What does (*p)++ do to the value there?","An array name passed to a function becomes an address of the first element.","Unfold the calls: f(4)=4*f(3) and so on until n==0."];
+const RUB={A:[[/break/,2],[/(stop|exit|leave|end|terminate|quit)/,2],[/continue/,2],[/(skip|next|rest|remaining)/,2],[/(but|whereas|while|however|unlike|instead|differ)/,2],[/(like|imagine|suppose|example|analogy|for instance|just as)/,4]],B:[[/(copy|duplicate|photocopy|xerox)/,3],[/(reference|address|pointer)/,3],[/original/,2],[/(not (change|affect|modif)|unchanged|no effect|remain)/,2],[/(chang|modif|updat)/,2],[/(like|imagine|suppose|example|analogy|for instance|just as)/,2]]};
+const TB={A:"Explain the difference between break and continue using a real-life example (not a coding example).",B:"Explain call by value vs call by reference using a real-life analogy (like a photocopy vs the original document)."};
+const steps=[];Q.filter(q=>q[0]=="A").forEach((q,i)=>steps.push({t:"q",i:Q.indexOf(q)}));steps.push({t:"tb",p:"A"});
+Q.filter(q=>q[0]=="B").forEach(q=>steps.push({t:"q",i:Q.indexOf(q)}));steps.push({t:"tb",p:"B"});
+const MAXQ=4,MAXTB=14,TOTAL=Q.length*MAXQ+2*MAXTB;
+let S={reg:null,k:0,pts:[],tb:{},hint:false,done:false},cap={};
+const $=s=>document.querySelector(s),app=$("#app");
+const el=(h)=>{const d=document.createElement("div");d.innerHTML=h;return d};
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+
+home();
+
+function home(){
+  app.innerHTML=`<div class="card"><h1>C Quest ⚔️</h1><p class="mu">BCA Assignment · Part A: Decision Making &amp; Looping · Part B: Arrays &amp; Functions</p>
+ <p>Predict outputs of real C code, use the hints (hints cost marks), explain concepts in your own words, and earn your certificate. <b>${TOTAL} marks</b> in total.</p>
+ <label>Full name</label><input id="n" placeholder="As per college record" autocomplete="name">
+ <label>Enrollment number</label><input id="e" placeholder="e.g. 2501234567">
+ <label>Division</label><input id="d" placeholder="e.g. A" maxlength="4">
+ <p class="mu" id="er" style="color:var(--bad)"></p>
+ <button class="p" id="go">Start Quest</button></div>
+ <div class="card mu"><b>Rules:</b> one answer per question · correct = ${MAXQ} marks · correct after AI hint = ${MAXQ/2} · hints never give the answer, only a nudge · teach-back rounds are checked automatically and reviewed by your teacher (${MAXTB} marks each). Your result is sent to your teacher when you finish.</div>`;
+ $("#go").onclick=()=>{const n=$("#n").value.trim(),e=$("#e").value.trim(),d=$("#d").value.trim().toUpperCase();
+  if(n.split(/\s+/).length<2||!e||!d){$("#er").textContent="Please enter your full name, enrollment number and division.";return}
+  S={reg:{n,e,d},k:0,pts:[],tb:{},hint:false,done:false};step()};
+}
+
+function step(){
+ if(S.k>=steps.length)return finish();
+ const st=steps[S.k],pct=Math.round(S.k/steps.length*100);
+ const head=`<div class="card" style="padding:12px"><div class="row" style="justify-content:space-between"><span class="mu">${esc(S.reg.n)} · ${esc(S.reg.e)} · Div ${esc(S.reg.d)}</span><span class="mu">Score: ${cur()}</span></div><div class="bar"><i style="width:${pct}%"></i></div></div>`;
+ if(st.t=="q")return ques(st,head);
+ return teach(st,head);
+}
+function cur(){return S.pts.reduce((a,b)=>a+b,0)+Object.values(S.tb).reduce((a,b)=>a+b.s,0)}
+
+function ques(st,head){
+ const q=Q[st.i];S.hint=false;let answered=false;
+ app.innerHTML=head+`<div class="card"><span class="tag">Part ${q[0]}</span> <span class="mu">Question ${S.k+1} of ${steps.length}</span><h2 style="margin-top:8px">${esc(q[2])}</h2><pre id="c"></pre><div id="o"></div>
+ <div class="row" style="margin-top:8px"><button id="h">💡 Hint (−${MAXQ/2} marks)</button></div><div id="x"></div></div>`;
+ $("#c").textContent=q[1];
+ q[3].forEach((t,i)=>{const b=document.createElement("button");b.className="opt";b.textContent=String.fromCharCode(65+i)+". "+t;
+  b.onclick=()=>{if(answered)return;answered=true;const ok=i==q[4];
+   S.pts[S.k]=ok?(S.hint?MAXQ/2:MAXQ):0;
+   [...$("#o").children].forEach((c,j)=>{if(j==q[4])c.classList.add("ok");else if(j==i)c.classList.add("no")});
+   $("#h").disabled=true;
+   $("#x").innerHTML=`<div class="box"><b>${ok?"✅ Correct":"❌ Not quite"}</b> (+${S.pts[S.k]}). ${esc(q[5])}</div><button class="p" id="nx" style="margin-top:10px">Next →</button>`;
+   $("#nx").onclick=()=>{S.k++;step()}};
+  $("#o").appendChild(b)});
+ $("#h").onclick=()=>{if(answered||S.hint)return;S.hint=true;$("#h").disabled=true;$("#x").innerHTML='<div class="box">💡 '+esc(HINTS[st.i])+'</div>'};
+}
+
+function teach(st,head){
+ const p=st.p;
+ app.innerHTML=head+`<div class="card"><span class="tag">Part ${p} · Teach-back</span><h2 style="margin-top:8px">Explain it in your own words</h2><p>${esc(TB[p])}</p>
+ <textarea id="t" rows="6" placeholder="Write 3–6 sentences in your own words. Teacher will read it."></textarea>
+ <p class="mu" id="m"></p><button class="p" id="s">Submit</button><div id="x"></div></div>`;
+ $("#s").onclick=async()=>{const txt=$("#t").value.trim();
+  if(txt.split(/\s+/).length<25){$("#m").textContent="Please write at least 25 words.";return}
+  $("#s").disabled=true;$("#x").innerHTML='<div class="box">Checking…</div>';
+  const low=txt.toLowerCase();let s=0;RUB[p].forEach(r=>{if(r[0].test(low))s+=r[1]});s=Math.min(MAXTB,s);
+  const fb="Provisional score from keyword check. Your teacher will review your answer.";
+  S.tb[p]={s,txt,fb};
+  $("#x").innerHTML=`<div class="box"><b>Provisional score: ${s}/${MAXTB}</b><br>${esc(fb)}</div><button class="p" id="nx" style="margin-top:10px">${S.k+1>=steps.length?"Finish & get certificate":"Continue to Part B →"}</button>`;
+  $("#nx").onclick=()=>{S.k++;step()}};
+}
+
+async function finish(){
+ const sc=cur(),id=cid(S.reg,sc),correct=S.pts.filter(x=>x>0).length;
+ const rec={name:S.reg.n,enrol:S.reg.e,div:S.reg.d,score:sc,total:TOTAL,partA:S.pts.slice(0,9).reduce((a,b)=>a+b,0),partB:S.pts.slice(9).reduce((a,b)=>a+b,0),tbA:S.tb.A.s,tbB:S.tb.B.s,tbAtext:S.tb.A.txt,tbBtext:S.tb.B.txt,cert:id,at:new Date().toISOString(),attempts:1};
+ let msg="";const code=[S.reg.e,S.reg.d,sc,id].join("-");
+ if(CONFIG.FORM_ACTION){try{const E=CONFIG.ENTRY,f=new URLSearchParams();f.set(E.name,rec.name);f.set(E.enrol,rec.enrol);f.set(E.div,rec.div);f.set(E.score,sc);f.set(E.partA,rec.partA);f.set(E.partB,rec.partB);f.set(E.tb,"A("+rec.tbA+"): "+rec.tbAtext+" || B("+rec.tbB+"): "+rec.tbBtext);f.set(E.cert,id);
+  await fetch(CONFIG.FORM_ACTION,{method:"POST",mode:"no-cors",body:f});msg="✅ Result sent to your teacher."}catch(e){}}
+ if(!msg)msg='⚠️ Could not send result. Show this code to your teacher: <b>'+esc(code)+'</b>';
+ const best=rec.score;
+ app.innerHTML=`<div class="card"><h1>Quest complete 🎉</h1><p><b>${sc} / ${TOTAL}</b> (${Math.round(sc/TOTAL*100)}%) · Part A ${rec.partA}/36 · Part B ${rec.partB}/36 · Teach-back ${rec.tbA}+${rec.tbB}/28</p><p class="mu">${msg}</p></div>
+ <div class="card"><canvas id="cv" width="1200" height="850"></canvas><div class="row" style="margin-top:10px"><button class="p" id="dl">Download certificate (PNG)</button><button id="again">Play again</button></div></div>`;
+ drawCert($("#cv"),S.reg,sc,id);
+ $("#again").onclick=home;
+ $("#dl").onclick=()=>{const a=document.createElement("a");a.href=$("#cv").toDataURL("image/png");a.download="C-Quest-Certificate-"+S.reg.e+".png";document.body.appendChild(a);a.click();a.remove()};
+}
+function cid(r,sc){let h=0;const s=r.e+r.d+r.n+sc;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;return "CQ-"+h.toString(36).toUpperCase().padStart(7,"0")}
+function drawCert(cv,r,sc,id){
+ const x=cv.getContext("2d"),W=1200,H=850;x.fillStyle="#fffdf5";x.fillRect(0,0,W,H);
+ x.strokeStyle="#4f46e5";x.lineWidth=14;x.strokeRect(30,30,W-60,H-60);x.strokeStyle="#c9a227";x.lineWidth=3;x.strokeRect(54,54,W-108,H-108);
+ x.textAlign="center";x.fillStyle="#1b2033";
+ x.font="bold 58px Georgia,serif";x.fillText("Certificate of Completion",W/2,190);
+ x.font="24px Georgia,serif";x.fillStyle="#5d6584";x.fillText("This is proudly presented to",W/2,265);
+ x.fillStyle="#4f46e5";x.font="italic bold 64px Georgia,serif";x.fillText(r.n,W/2,360);
+ x.fillStyle="#1b2033";x.font="26px Georgia,serif";x.fillText("Enrollment No: "+r.e+"   ·   Division: "+r.d,W/2,420);
+ x.font="26px Georgia,serif";x.fillText("for successfully completing the assignment",W/2,495);
+ x.font="bold 36px Georgia,serif";x.fillText("C Quest: Decision Making, Looping, Arrays & Functions",W/2,550);
+ x.font="bold 40px Georgia,serif";x.fillStyle="#15803d";x.fillText("Score: "+sc+" / "+TOTAL+"  ("+Math.round(sc/TOTAL*100)+"%)",W/2,640);
+ x.fillStyle="#5d6584";x.font="20px Georgia,serif";x.fillText("BCA · Programming in C · "+new Date().toLocaleDateString("en-IN",{day:"numeric",month:"long",year:"numeric"}),W/2,720);
+ x.fillText("Certificate ID: "+id,W/2,755);
+}
+
+</script></body></html>
